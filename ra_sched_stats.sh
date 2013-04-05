@@ -187,9 +187,33 @@ done
 # Calculating average baselines
 
 K_AVRG=`expr $K_AVRG / $K_COUNT`
+if [ $? -ne 0 ]
+then
+K_MIN="n/a"
+K_MAX="n/a"
+K_AVRG="n/a"
+fi
 C_AVRG=`expr $C_AVRG / $C_COUNT`
+if [ $? -ne 0 ]
+then
+C_MIN="n/a"
+C_MAX="n/a"
+C_AVRG="n/a"
+fi
 L_AVRG=`expr $L_AVRG / $L_COUNT`
+if [ $? -ne 0 ]
+then
+L_MIN="n/a"
+L_MAX="n/a"
+L_AVRG="n/a"
+fi
 P_AVRG=`expr $P_AVRG / $P_COUNT`
+if [ $? -ne 0 ]
+then
+P_MIN="n/a"
+P_MAX="n/a"
+P_AVRG="n/a"
+fi
 
 
 #Generate CSV
@@ -204,11 +228,22 @@ echo "P(92cm);$P_COUNT;$P_MIN;$P_MAX;$P_AVRG;$P_TIME" >> "$2.csv"
 # Format the cumulated times to Days:Hours:Minutes
 
 SUM_TIME=`date -j -f "%s" $SUM_TIME "+%d:%H:%m"`
+if [ $K_TIME -ne 0 ]
+then
 K_TIME=`date -j -f "%s" $K_TIME "+%d:%H:%m"`
+fi
+if [ $C_TIME -ne 0 ]
+then
 C_TIME=`date -j -f "%s" $C_TIME "+%d:%H:%m"`
+fi
+if [ $L_TIME -ne 0 ]
+then
 L_TIME=`date -j -f "%s" $L_TIME "+%d:%H:%m"`
+fi
+if [ $K_TIME -ne 0 ]
+then
 P_TIME=`date -j -f "%s" $P_TIME "+%d:%H:%m"`
-
+fi
 
 # Calculate the total amount of observations
 SUM_COUNT=`grep -v '#' "$1" | grep 'Band:' | wc -l`
