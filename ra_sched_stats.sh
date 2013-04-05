@@ -8,13 +8,14 @@
 # (at your option) any later version.
 #
 # Generating statistics for the monthly RadioAstron block schedule files published by ASC
-# Optimized for the format used since Feb 2013 - older files need to be reformatted
+# Optimized for the format used since Feb 2013 - older files need to be reformatted!
 # Block schedules can be downloaded here: ftp://jet.asc.rssi.ru/outgoing/yyk/Radioastron/block_schedule/
 # $1 = Block schedule file $2 = Output file, also needed as a temporary buffer!
 # This script generates to output files - "$2" contains the output as BBCode, "$2.csv" as Comma-Separated-Values
-# This script uses BSD date to convert date/time!
+# This script uses either BSD date or GNU date to convert date/time!
+# Using another implementation of date can totally deactivate the time calculation
 #
-# If you fix any bugs in this script (or manage to use GNU date, which seems to be better for Linux-Users), please let me know ;-)
+# If you fix any bugs in this script please let me know ;-)
 
 DATECHECK=`date --version` #Check wether we have GNU date or BSD date
 if [ $? -ne 0 ]
@@ -96,7 +97,7 @@ while [ $I -lt $SUM_COUNT ];do
     if [ "$DATEVER" == "BSD" ]
     then
 	    TIME_STOP=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_STOP" "+%s"`
-	fi
+    fi
 	TIME_OBSERVATION=`expr $TIME_STOP - $TIME_START`
 	POS=`expr $POS + 1`
 	#head -n "$POS" "$2" | tail -n 1
