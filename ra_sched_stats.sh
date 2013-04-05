@@ -16,6 +16,14 @@
 #
 # If you fix any bugs in this script (or manage to use GNU date, which seems to be better for Linux-Users), please let me know ;-)
 
+DATECHECK=`date --version` #Check wether we have GNU date or BSD date
+if [ $? -ne 0 ]
+then
+    DATEVER="BSD"
+else
+    DATEVER="GNU"
+fi
+
 # Extract time, baselines and used bands from the file - analyse only those observations for which the baseline is given
 grep -v '#' "$1" | grep '\(Band:\)\|\( *xED\)\|\(Start(UT)\)\|\(Stop(UT)\)' | grep -B 3 'Comment' | grep '\(Band:\)\|\( *xED\)\|\(Start(UT)\)\|\(Stop(UT)\)' > "$2"
 
@@ -65,10 +73,30 @@ while [ $I -lt $SUM_COUNT ];do
 	# Echo start time as debugging information - errors can occur when the input file entry differs from the standard format
 	# in case of errors simply adjust the input file before running this script again
 	echo "$TIME_START"
-	TIME_START=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_START" "+%s"`
+	if [ "$DATEVER" == "GNU" ]
+    then
+        TIME_ARRAY=(`echo $TIME_START | tr " " "\n"`)
+        TIME_ARRAY2=(`echo ${TIME_ARRAY[0]} | tr "." "\n"`)
+        TIME_START=`echo ${TIME_ARRAY2[2]}-${TIME_ARRAY2[1]}-${TIME_ARRAY2[0]} ${TIME_ARRAY[1]}`
+        TIME_START=`date -d "$TIME_START" "+%s"`
+    fi
+    if [ "$DATEVER" == "BSD" ]
+    then
+	    TIME_START=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_START" "+%s"`
+	fi
 	POS=`expr $POS + 1`
 	TIME_STOP=`head -n "$POS" "$2" | tail -n 1 | sed -e '/S/s/Stop(UT) : //g'`
-	TIME_STOP=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_STOP" "+%s"`
+	if [ "$DATEVER" == "GNU" ]
+    then
+        TIME_ARRAY=(`echo $TIME_STOP | tr " " "\n"`)
+        TIME_ARRAY2=(`echo ${TIME_ARRAY[0]} | tr "." "\n"`)
+        TIME_STOP=`echo ${TIME_ARRAY2[2]}-${TIME_ARRAY2[1]}-${TIME_ARRAY2[0]} ${TIME_ARRAY[1]}`
+        TIME_STOP=`date -d "$TIME_STOP" "+%s"`
+    fi
+    if [ "$DATEVER" == "BSD" ]
+    then
+	    TIME_STOP=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_STOP" "+%s"`
+	fi
 	TIME_OBSERVATION=`expr $TIME_STOP - $TIME_START`
 	POS=`expr $POS + 1`
 	#head -n "$POS" "$2" | tail -n 1
@@ -252,24 +280,46 @@ echo "Total;$SUM_NUM;$SUM_COUNT;$SUM_MIN;$SUM_MAX;$SUM_AVRG;$SUM_TIME" >> "$2.cs
 
 # Format the cumulated times to Days:Hours:Minutes
 
-SUM_TIME=`date -j -f "%s" $SUM_TIME "+%d:%H:%m"`
-if [ $K_TIME -ne 0 ]
+if [ "$DATEVER" == "GNU" ]
 then
-	K_TIME=`date -j -f "%s" $K_TIME "+%d:%H:%m"`
+    SUM_TIME=`date -d "@$SUM_TIME" "+%d:%H:%m"`
+    if [ $K_TIME -ne 0 ]
+    then
+        K_TIME=`date -d "@$K_TIME" "+%d:%H:%m"`
+    fi
+    if [ $C_TIME -ne 0 ]
+    then
+        C_TIME=`date -d "@$C_TIME" "+%d:%H:%m"`
+    fi
+    if [ $L_TIME -ne 0 ]
+    then
+        L_TIME=`date -d "@$L_TIME" "+%d:%H:%m"`
+    fi
+    if [ $K_TIME -ne 0 ]
+    then
+        P_TIME=`date -d "@$P_TIME" "+%d:%H:%m"`
+    fi
 fi
-if [ $C_TIME -ne 0 ]
+if [ "$DATEVER" == "BSD" ]
 then
-	C_TIME=`date -j -f "%s" $C_TIME "+%d:%H:%m"`
+    SUM_TIME=`date -j -f "%s" $SUM_TIME "+%d:%H:%m"`
+    if [ $K_TIME -ne 0 ]
+    then
+	    K_TIME=`date -j -f "%s" $K_TIME "+%d:%H:%m"`
+    fi
+    if [ $C_TIME -ne 0 ]
+    then
+	    C_TIME=`date -j -f "%s" $C_TIME "+%d:%H:%m"`
+    fi
+    if [ $L_TIME -ne 0 ]
+    then
+	    L_TIME=`date -j -f "%s" $L_TIME "+%d:%H:%m"`
+    fi
+    if [ $P_TIME -ne 0 ]
+    then
+	    P_TIME=`date -j -f "%s" $P_TIME "+%d:%H:%m"`
+    fi
 fi
-if [ $L_TIME -ne 0 ]
-then
-	L_TIME=`date -j -f "%s" $L_TIME "+%d:%H:%m"`
-fi
-if [ $P_TIME -ne 0 ]
-then
-	P_TIME=`date -j -f "%s" $P_TIME "+%d:%H:%m"`
-fi
-
 # Output results as plain text
 echo "Band      TotalNumber	Anal.Number	Min.BL	Max.BL	Avrg.BL		Time"
 echo "K(1.3cm)  $K_NUM		$K_COUNT	$K_MIN	$K_MAX	$K_AVRG		$K_TIME"
