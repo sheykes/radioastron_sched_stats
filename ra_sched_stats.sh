@@ -17,7 +17,7 @@
 #
 # If you fix any bugs in this script please let me know ;-)
 
-DATECHECK=`date --version` #Check wether we have GNU date or BSD date
+DATECHECK=$(date --version) #Check wether we have GNU date or BSD date
 if [ $? -ne 0 ]
 then
     DATEVER="BSD"
@@ -29,29 +29,29 @@ fi
 grep -v '#' "$1" | grep '\(Band:\)\|\( *xED\)\|\(Start(UT)\)\|\(Stop(UT)\)' | grep -B 3 'Comment' | grep '\(Band:\)\|\( *xED\)\|\(Start(UT)\)\|\(Stop(UT)\)' > "$2"
 
 # Variables to store statistical values
-K_COUNT=`grep 'K' "$2" | wc -l`
-K_COUNT=`expr $K_COUNT + 0`
+K_COUNT=$(grep 'K' "$2" | wc -l)
+K_COUNT=$(expr $K_COUNT + 0)
 K_TIME=0
 K_MIN=50
 K_MAX=0
 K_AVRG=0
 
-C_COUNT=`grep 'Band:' "$2" | grep 'C' | wc -l`
-C_COUNT=`expr $C_COUNT + 0`
+C_COUNT=$(grep 'Band:' "$2" | grep 'C' | wc -l)
+C_COUNT=$(expr $C_COUNT + 0)
 C_TIME=0
 C_MIN=50
 C_MAX=0
 C_AVRG=0
 
-L_COUNT=`grep 'L' "$2" | wc -l`
-L_COUNT=`expr $L_COUNT + 0`
+L_COUNT=$(grep 'L' "$2" | wc -l)
+L_COUNT=$(expr $L_COUNT + 0)
 L_TIME=0
 L_MIN=50
 L_MAX=0
 L_AVRG=0
 
-P_COUNT=`grep 'P' "$2" | wc -l`
-P_COUNT=`expr $P_COUNT + 0`
+P_COUNT=$(grep 'P' "$2" | wc -l)
+P_COUNT=$(expr $P_COUNT + 0)
 P_TIME=0
 P_MIN=50
 P_MAX=0
@@ -59,8 +59,8 @@ P_AVRG=0
 
 
 SUM_TIME=0
-SUM_COUNT=`cat "$2" | wc -l`
-SUM_COUNT=`expr $SUM_COUNT / 4`
+SUM_COUNT=$(cat "$2" | wc -l)
+SUM_COUNT=$(expr $SUM_COUNT / 4)
 SUM_MIN=50
 SUM_MAX=0
 SUM_AVRG=0
@@ -68,47 +68,47 @@ SUM_AVRG=0
 # Analyzing single observations
 I=0
 while [ $I -lt $SUM_COUNT ];do
-	I=`expr $I + 1`
-	POS=`expr $I \* 4 - 3`
-	TIME_START=`head -n "$POS" "$2" | tail -n 1 | sed -e '/S/s/Start(UT): //g'`
+	I=$(expr $I + 1)
+	POS=$(expr $I \* 4 - 3)
+	TIME_START=$(head -n "$POS" "$2" | tail -n 1 | sed -e '/S/s/Start(UT): //g')
 	# Echo start time as debugging information - errors can occur when the input file entry differs from the standard format
 	# in case of errors simply adjust the input file before running this script again
 	echo "$TIME_START"
 	if [ "$DATEVER" == "GNU" ]
     then
-        TIME_ARRAY=(`echo $TIME_START | tr " " "\n"`)
-        TIME_ARRAY2=(`echo ${TIME_ARRAY[0]} | tr "." "\n"`)
-        TIME_START=`echo ${TIME_ARRAY2[2]}-${TIME_ARRAY2[1]}-${TIME_ARRAY2[0]} ${TIME_ARRAY[1]}`
-        TIME_START=`date -d "$TIME_START" "+%s"`
+        TIME_ARRAY=$( (echo $TIME_START | tr " " "\n") )
+        TIME_ARRAY2=$( (echo ${TIME_ARRAY[0]} | tr "." "\n") )
+        TIME_START=$(echo ${TIME_ARRAY2[2]}-${TIME_ARRAY2[1]}-${TIME_ARRAY2[0]} ${TIME_ARRAY[1]})
+        TIME_START=$(date -d "$TIME_START" "+%s")
     fi
     if [ "$DATEVER" == "BSD" ]
     then
-	    TIME_START=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_START" "+%s"`
+	    TIME_START=$(date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_START" "+%s")
 	fi
-	POS=`expr $POS + 1`
-	TIME_STOP=`head -n "$POS" "$2" | tail -n 1 | sed -e '/S/s/Stop(UT) : //g'`
+	POS=$(expr $POS + 1)
+	TIME_STOP=$(head -n "$POS" "$2" | tail -n 1 | sed -e '/S/s/Stop(UT) : //g')
 	if [ "$DATEVER" == "GNU" ]
     then
-        TIME_ARRAY=(`echo $TIME_STOP | tr " " "\n"`)
-        TIME_ARRAY2=(`echo ${TIME_ARRAY[0]} | tr "." "\n"`)
-        TIME_STOP=`echo ${TIME_ARRAY2[2]}-${TIME_ARRAY2[1]}-${TIME_ARRAY2[0]} ${TIME_ARRAY[1]}`
-        TIME_STOP=`date -d "$TIME_STOP" "+%s"`
+        TIME_ARRAY=$( (echo $TIME_STOP | tr " " "\n") )
+        TIME_ARRAY2=$( (echo ${TIME_ARRAY[0]} | tr "." "\n") )
+        TIME_STOP=$(echo ${TIME_ARRAY2[2]}-${TIME_ARRAY2[1]}-${TIME_ARRAY2[0]} ${TIME_ARRAY[1]})
+        TIME_STOP=$(date -d "$TIME_STOP" "+%s")
     fi
     if [ "$DATEVER" == "BSD" ]
     then
-	    TIME_STOP=`date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_STOP" "+%s"`
+	    TIME_STOP=$(date -j -f "%d.%m.%Y %H:%M:%S" "$TIME_STOP" "+%s")
     fi
-	TIME_OBSERVATION=`expr $TIME_STOP - $TIME_START`
-	POS=`expr $POS + 1`
+	TIME_OBSERVATION=$(expr $TIME_STOP - $TIME_START)
+	POS=$(expr $POS + 1)
 	#head -n "$POS" "$2" | tail -n 1
-	BAND=`head -n "$POS" "$2" | tail -n 1 | sed -e '/B/s/Band: //g'`
-	POS=`expr $POS + 1`
+	BAND=$(head -n "$POS" "$2" | tail -n 1 | sed -e '/B/s/Band: //g')
+	POS=$(expr $POS + 1)
 	#head -n "$POS" "$2" | tail -n 1
-	BASELINE=`head -n "$POS" "$2" | tail -n 1 | sed -e '/C/s/Comments: //g' | sed 's/\([0-9]*\).*/\1/'`
+	BASELINE=$(head -n "$POS" "$2" | tail -n 1 | sed -e '/C/s/Comments: //g' | sed 's/\([0-9]*\).*/\1/')
 	
 	
-	SUM_AVRG=`expr $SUM_AVRG + $BASELINE`
-	SUM_TIME=`expr $SUM_TIME + $TIME_OBSERVATION`
+	SUM_AVRG=$(expr $SUM_AVRG + $BASELINE)
+	SUM_TIME=$(expr $SUM_TIME + $TIME_OBSERVATION)
 	if [ $SUM_MIN -gt $BASELINE ]
 		then
 			SUM_MIN=$BASELINE
@@ -119,8 +119,8 @@ while [ $I -lt $SUM_COUNT ];do
 	fi
 	case "${BAND:0:1}" in
 		K)
-			K_AVRG=`expr $K_AVRG + $BASELINE`
-			K_TIME=`expr $K_TIME + $TIME_OBSERVATION`
+			K_AVRG=$(expr $K_AVRG + $BASELINE)
+			K_TIME=$(expr $K_TIME + $TIME_OBSERVATION)
 			if [ $K_MIN -gt $BASELINE ]
 			then
 				K_MIN=$BASELINE
@@ -131,8 +131,8 @@ while [ $I -lt $SUM_COUNT ];do
 			fi
 		;;
 		C)
-			C_AVRG=`expr $C_AVRG + $BASELINE`
-			C_TIME=`expr $C_TIME + $TIME_OBSERVATION`
+			C_AVRG=$(expr $C_AVRG + $BASELINE)
+			C_TIME=$(expr $C_TIME + $TIME_OBSERVATION)
 			if [ $C_MIN -gt $BASELINE ]
 			then
 				C_MIN=$BASELINE
@@ -143,8 +143,8 @@ while [ $I -lt $SUM_COUNT ];do
 			fi
 		;;
 		L)
-			L_AVRG=`expr $L_AVRG + $BASELINE`
-			L_TIME=`expr $L_TIME + $TIME_OBSERVATION`
+			L_AVRG=$(expr $L_AVRG + $BASELINE)
+			L_TIME=$(expr $L_TIME + $TIME_OBSERVATION)
 			if [ $L_MIN -gt $BASELINE ]
 			then
 				L_MIN=$BASELINE
@@ -155,8 +155,8 @@ while [ $I -lt $SUM_COUNT ];do
 			fi
 		;;
 		P)
-			P_AVRG=`expr $P_AVRG + $BASELINE`
-			P_TIME=`expr $P_TIME + $TIME_OBSERVATION`
+			P_AVRG=$(expr $P_AVRG + $BASELINE)
+			P_TIME=$(expr $P_TIME + $TIME_OBSERVATION)
 			if [ $P_MIN -gt $BASELINE ]
 			then
 				P_MIN=$BASELINE
@@ -173,8 +173,8 @@ while [ $I -lt $SUM_COUNT ];do
 	then
 		case "${BAND:1:1}" in
 			K)
-				K_AVRG=`expr $K_AVRG + $BASELINE`
-				K_TIME=`expr $K_TIME + $TIME_OBSERVATION`
+				K_AVRG=$(expr $K_AVRG + $BASELINE)
+				K_TIME=$(expr $K_TIME + $TIME_OBSERVATION)
 				if [ $K_MIN -gt $BASELINE ]
 				then
 					K_MIN=$BASELINE
@@ -185,8 +185,8 @@ while [ $I -lt $SUM_COUNT ];do
 				fi
 			;;
 			C)
-				C_AVRG=`expr $C_AVRG + $BASELINE`
-				C_TIME=`expr $C_TIME + $TIME_OBSERVATION`
+				C_AVRG=$(expr $C_AVRG + $BASELINE)
+				C_TIME=$(expr $C_TIME + $TIME_OBSERVATION)
 				if [ $C_MIN -gt $BASELINE ]
 				then
 					C_MIN=$BASELINE
@@ -197,8 +197,8 @@ while [ $I -lt $SUM_COUNT ];do
 				fi
 			;;
 			L)
-				L_AVRG=`expr $L_AVRG + $BASELINE`
-				L_TIME=`expr $L_TIME + $TIME_OBSERVATION`
+				L_AVRG=$(expr $L_AVRG + $BASELINE)
+				L_TIME=$(expr $L_TIME + $TIME_OBSERVATION)
 				if [ $L_MIN -gt $BASELINE ]
 				then
 					L_MIN=$BASELINE
@@ -209,8 +209,8 @@ while [ $I -lt $SUM_COUNT ];do
 				fi
 			;;
 			P)
-				P_AVRG=`expr $P_AVRG + $BASELINE`
-				P_TIME=`expr $P_TIME + $TIME_OBSERVATION`
+				P_AVRG=$(expr $P_AVRG + $BASELINE)
+				P_TIME=$(expr $P_TIME + $TIME_OBSERVATION)
 				if [ $P_MIN -gt $BASELINE ]
 				then
 					P_MIN=$BASELINE
@@ -228,35 +228,35 @@ done
 
 # Calculating average baselines
 
-K_AVRG=`expr $K_AVRG / $K_COUNT`
+K_AVRG=$(expr $K_AVRG / $K_COUNT)
 if [ $? -ne 0 ]
 then
 	K_MIN="n/a"
 	K_MAX="n/a"
 	K_AVRG="n/a"
 fi
-C_AVRG=`expr $C_AVRG / $C_COUNT`
+C_AVRG=$(expr $C_AVRG / $C_COUNT)
 if [ $? -ne 0 ]
 then
 	C_MIN="n/a"
 	C_MAX="n/a"
 	C_AVRG="n/a"
 fi
-L_AVRG=`expr $L_AVRG / $L_COUNT`
+L_AVRG=$(expr $L_AVRG / $L_COUNT)
 if [ $? -ne 0 ]
 then
 	L_MIN="n/a"
 	L_MAX="n/a"
 	L_AVRG="n/a"
 fi
-P_AVRG=`expr $P_AVRG / $P_COUNT`
+P_AVRG=$(expr $P_AVRG / $P_COUNT)
 if [ $? -ne 0 ]
 then
 	P_MIN="n/a"
 	P_MAX="n/a"
 	P_AVRG="n/a"
 fi
-SUM_AVRG=`expr $SUM_AVRG / $SUM_COUNT`
+SUM_AVRG=$(expr $SUM_AVRG / $SUM_COUNT)
 if [ $? -ne 0 ]
 then
 	SUM_MIN="n/a"
@@ -265,11 +265,11 @@ then
 fi
 
 # Calculate the total amount of observations
-K_NUM=`grep -v '#' "$1" | grep 'Band:' | grep 'K' | wc -l`
-C_NUM=`grep -v '#' "$1" | grep 'Band:' | grep 'C' | wc -l`
-L_NUM=`grep -v '#' "$1" | grep 'Band:' | grep 'L' | wc -l`
-P_NUM=`grep -v '#' "$1" | grep 'Band:' | grep 'P' | wc -l`
-SUM_NUM=`grep -v '#' "$1" | grep 'Band:' | wc -l`
+K_NUM=$(grep -v '#' "$1" | grep 'Band:' | grep 'K' | wc -l)
+C_NUM=$(grep -v '#' "$1" | grep 'Band:' | grep 'C' | wc -l)
+L_NUM=$(grep -v '#' "$1" | grep 'Band:' | grep 'L' | wc -l)
+P_NUM=$(grep -v '#' "$1" | grep 'Band:' | grep 'P' | wc -l)
+SUM_NUM=$(grep -v '#' "$1" | grep 'Band:' | wc -l)
 
 #Generate CSV
 echo "Band;Total Number;Analysed Number;Min.Baseline;Max.Baseline;Avrg.Baseline;Time" > "$2.csv"
@@ -283,42 +283,42 @@ echo "Total;$SUM_NUM;$SUM_COUNT;$SUM_MIN;$SUM_MAX;$SUM_AVRG;$SUM_TIME" >> "$2.cs
 
 if [ "$DATEVER" == "GNU" ]
 then
-    SUM_TIME=`date -d "@$SUM_TIME" "+%d:%H:%m"`
+    SUM_TIME=$(date -d "@$SUM_TIME" "+%d:%H:%m")
     if [ $K_TIME -ne 0 ]
     then
-        K_TIME=`date -d "@$K_TIME" "+%d:%H:%m"`
+        K_TIME=$(date -d "@$K_TIME" "+%d:%H:%m")
     fi
     if [ $C_TIME -ne 0 ]
     then
-        C_TIME=`date -d "@$C_TIME" "+%d:%H:%m"`
+        C_TIME=$(date -d "@$C_TIME" "+%d:%H:%m")
     fi
     if [ $L_TIME -ne 0 ]
     then
-        L_TIME=`date -d "@$L_TIME" "+%d:%H:%m"`
+        L_TIME=$(date -d "@$L_TIME" "+%d:%H:%m")
     fi
     if [ $K_TIME -ne 0 ]
     then
-        P_TIME=`date -d "@$P_TIME" "+%d:%H:%m"`
+        P_TIME=$(date -d "@$P_TIME" "+%d:%H:%m")
     fi
 fi
 if [ "$DATEVER" == "BSD" ]
 then
-    SUM_TIME=`date -j -f "%s" $SUM_TIME "+%d:%H:%m"`
+    SUM_TIME=$(date -j -f "%s" $SUM_TIME "+%d:%H:%m")
     if [ $K_TIME -ne 0 ]
     then
-	    K_TIME=`date -j -f "%s" $K_TIME "+%d:%H:%m"`
+	    K_TIME=$(date -j -f "%s" $K_TIME "+%d:%H:%m")
     fi
     if [ $C_TIME -ne 0 ]
     then
-	    C_TIME=`date -j -f "%s" $C_TIME "+%d:%H:%m"`
+	    C_TIME=$(date -j -f "%s" $C_TIME "+%d:%H:%m")
     fi
     if [ $L_TIME -ne 0 ]
     then
-	    L_TIME=`date -j -f "%s" $L_TIME "+%d:%H:%m"`
+	    L_TIME=$(date -j -f "%s" $L_TIME "+%d:%H:%m")
     fi
     if [ $P_TIME -ne 0 ]
     then
-	    P_TIME=`date -j -f "%s" $P_TIME "+%d:%H:%m"`
+	    P_TIME=$(date -j -f "%s" $P_TIME "+%d:%H:%m")
     fi
 fi
 # Output results as plain text
